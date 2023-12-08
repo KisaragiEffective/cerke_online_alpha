@@ -3,25 +3,68 @@
     <meta charset="UTF-8">
     <title>机戦（パイグ将棋）オンライン対戦システム Cerke Online</title>
     <link href="entrance.css" rel="stylesheet" type="text/css" >
+    <style>
+        @font-face {
+            font-family: 'cirlipa';
+            src: url('https://sozysozbot.github.io/fonts/cirlxarli_liparxe_1.woff') format('woff');
+        }
+
+        :lang(x-lineparine) {
+            font-family: 'cirlipa';
+        }
+    </style>
 </head>
 <body>
     <div id="outer_container">
     <div id="container">
-        <img src="entrance_image/cerke_online_logo.png" id="cerke_online_logo" >
-        <a href="pending_vs_cpu.html"><img src="entrance_image/cpu.png" id="cpu_button"></a>
-        <a href="pending_random.html"><img src="entrance_image/random.png" id="random_button" style="cursor: pointer"></a>
-        <img src="entrance_image/friend.png" id="friend_button">
+        <a href="index.html"><img src="entrance_image/ja/cerke_online_logo.png" id="cerke_online_logo" ></a>
+        <a href="pending_vs_cpu.html"><img src="entrance_image/ja/cpu.png" id="cpu_button"></a>
+        <a href="pending_random.html"><img src="entrance_image/ja/random.png" id="random_button" style="cursor: pointer"></a>
+        <a href="friend_make_room.html"><img src="entrance_image/ja/friend.png" id="friend_button"></a>
         <div id="blog_link_container"><a href="blog.html" id="blog_link">更新履歴</a></div>
+        <div id="lang_selector_container">
+            <select id="lang_selector" name="lang_selector" onchange="location.href = `entrance.html?lang=${encodeURIComponent(this.value)}`">
+            </select>
+        </div>
     </div>
 </div>
 <script>
+    const raw_lang = new URLSearchParams(new URL(location.href).search).get("lang");
+
+    // Originally written as 
+    // ["x-faikleone", "ja"].includes(raw_lang) ? raw_lang : "ja"
+    // but since CodeQL cannot understand that this is safe and gives out an alert,
+    // (private url: https://github.com/jurliyuuri/cerke_online_alpha/security/code-scanning/3 )
+    // I will instead write it in a lame way.
+
+    // もともとは
+    // ["x-faikleone", "ja"].includes(raw_lang) ? raw_lang : "ja"
+    // としていたが、これが安全であるということを CodeQL は見抜けず、警告を出すので
+    // (private url: https://github.com/jurliyuuri/cerke_online_alpha/security/code-scanning/3 )
+    // こういうダサい書き方に書き換えておく
+    const lang = raw_lang === "ja" ? "ja" : raw_lang === "x-faikleone" ? "x-faikleone" : "ja";
+    sessionStorage.lang = lang;
+
+    const link = document.getElementById("blog_link");
+    if (lang === "x-faikleone") {
+        link.textContent = "klant";
+        link.style.fontFamily = "cirlipa";
+        document.getElementById("lang_selector").innerHTML = `<option value="x-faikleone" style="font-family: cirlipa" selected>faikleone</option><option value="ja">現世（日本語）</option>`;
+        document.getElementById("lang_selector").style.fontFamily = "cirlipa";
+    } else if (lang === "ja") {
+        link.textContent = "更新履歴";
+        link.style.fontFamily = "sans-serif";
+        document.getElementById("lang_selector").innerHTML = `<option value="x-faikleone" style="font-family: cirlipa">faikleone</option><option value="ja" selected>現世（日本語）</option>`;
+        document.getElementById("lang_selector").style.fontFamily = "sans-serif";
+    }
+
     // Replace the images with a very lame design in the staging environment
     // ステージング環境においてはクソダサ画像にすり替えることで、本番環境との混同を防ぐ
-    if (location.href.includes("staging")) {
-        document.getElementById("cerke_online_logo").src = "entrance_image_staging/cerke_online_logo.png";
-        document.getElementById("cpu_button").src = "entrance_image_staging/cpu.png";
-        document.getElementById("random_button").src = "entrance_image_staging/random.png";
-        document.getElementById("friend_button").src = "entrance_image_staging/friend.png";
-    }
+    const folder = location.href.includes("staging") ? "x-staging" : lang;
+
+    document.getElementById("cerke_online_logo").src = `entrance_image/${folder}/cerke_online_logo.png`;
+    document.getElementById("cpu_button").src = `entrance_image/${folder}/cpu.png`;
+    document.getElementById("random_button").src = `entrance_image/${folder}/random.png`;
+    document.getElementById("friend_button").src = `entrance_image/${folder}/friend.png`;
 </script>
 </body>

@@ -3,47 +3,100 @@
     <meta charset="UTF-8">
     <title>Cerke Online</title>
 <link rel="stylesheet" type="text/css" href="main.css">
+<style>
+    @font-face {
+        font-family: 'linmarn_bitmap';
+        src: url('https://sozysozbot.github.io/fonts/lin-marn-bitmap-font.woff') format('woff');
+    }
+
+    .always_linmarn_bitmap {
+        font-family: "linmarn_bitmap";
+    }
+
+    .use_linmarn_bitmap_unless_hovered {
+        font-family: "linmarn_bitmap";
+    }
+
+    .use_linmarn_bitmap_unless_hovered:hover {
+        font-family: monospace;
+    }
+
+    .always_geometric_linzklar {
+        font-family: 'geometric_linzklar'; 
+    }
+
+    .use_geometric_linzklar_unless_hovered {
+        font-family: 'geometric_linzklar'; 
+    }
+
+    .use_geometric_linzklar_unless_hovered:hover {
+        font-family: monospace;
+    }
+</style>
 </head>
 <body style="transform: translateX(-530px) scale(0.75) translateX(530px)">
 <div id="everything">
     <div id="scoreboard_containment">
         <img src="image/scoreboard_foreground_notch_doubled.png" style="position:absolute; background-image: url(image/scoreboard_rate_notch_partially_removed.png);" height="912">
-        <img id="denote_season" src="image/piece/rtam.png" style="top: 513px;" width="48">
+        <img id="denote_season" src="image/piece_img/官字/upright/rtam.png" style="top: 513px;" width="48">
         <img id="denote_score" src="image/wood_side.png" style="top: 447px;" width="48">
         <img id="denote_rate" src="image/wood_side2.png" style="position: absolute; top: 873px; left: 4px; display: none" width="48">
     </div>
     <img id="yaku_all" src="image/yaku_all.png" style="position: absolute; left: 750px; top: 350px" width="200" height="353.75">
     <div id="krut_cruop">
-        <input type="image" id="krut_cruop_button" src="image/kut2_cuop2_active.png">
+        <input type="image" id="krut_cruop_button" src="image/toggle/kut2_cuop2_active.png">
     </div>
     <div id="lork_liar">
-        <input type="image" id="lork_liar_button" src="image/lok1_lia1_inactive.png">
+        <input type="image" id="lork_liar_button" src="image/toggle/lok1_lia1_inactive.png">
     </div>
-    <div style="z-index: 4000; position: absolute; left: 623px; top: 597px;">
+    <div id="coord_toggle">
+        <input type="image" id="coord_toggle_button" src="image/toggle/coord_toggle_inactive.png">
+    </div>
+    <div style="z-index: 4000; position: absolute; left: 623px; top: 647px;">
         <input type="range" min="0" max="100" value="40" id="volume_slidebar" disabled="disabled" style="transform: rotate(-90deg); width: 100px">
     </div>
     <div id="field">
-    <div id="hop1zuo1_of_downward">
-        <div id="contains_pieces_on_downward">
+        <div id="hop1zuo1_of_downward">
+            <div id="contains_pieces_on_downward">
+            </div>
         </div>
-    </div>
-    <div id="board_containment">
-        <div id="board">
-            <img src="image/field.png" width="631" height="631" />
+        <div id="board_containment">
+            <div id="board">
+                <img src="image/field.png" width="631" height="631" />
+            </div>
+            <div id="contains_coord_annotation" style="position: absolute; top: -67px; left: -87px">
+                <img id="coord_annotation" src="image/IA_is_down=true.svg" width="783" height="767" style="visibility: hidden;" />
+            </div>
+            <div id="contains_pieces_on_board">
+            </div>
+            <div id="contains_phantom">
+            </div>
+            <div id="contains_guides">
+            </div>
         </div>
-        <div id="contains_pieces_on_board">
+        <div id="hop1zuo1_of_upward">
+            <!-- 
+                The element `hop1zuo1_of_upward_bg` needs to exist independently from `hop1zuo1_of_upward` due to the following reason.
+                First, we have to render the background color rgb(0, 255, 200) underneath the `contains_coord_annotation`.
+                But `contains_coord_annotation` cannot have a positive z-index, 
+                because a positive z-index will cover up the pieces on the board and will prevent the player from clicking a piece.
+                On the other hand, `hop1zuo1_of_upward` cannot have a negative z-index,
+                because a negative z-index will make hop1zuo1 unclickable.
+                Hence the only solution is to render the background color in a separate HTML element.
+
+                要素 `hop1zuo1_of_upward_bg` が `hop1zuo1_of_upward` とは独立して存在する必要がある。
+                なぜかというと、背景色 rgb(0, 255, 200) を `contains_coord_annotation` の下にレンダリングする必要があるが、
+                `contains_coord_annotation` に正の z-index を持たせてしまうと、
+                それが盤上の駒を覆ってしまってプレイヤーが駒ををクリックできなくなってしまう。
+                一方、`hop1zuo1_of_upward` に負の z-index を設定すると、手駒がクリックできなくなってしまう。
+                したがって、背景色を別のHTML要素でレンダリングするしかない。
+            -->
+            <div id="hop1zuo1_of_upward_bg"></div>
+            <div id="contains_pieces_on_upward">
+            </div>
+            <div id="contains_guides_on_upward">
+            </div>
         </div>
-        <div id="contains_phantom">
-        </div>
-        <div id="contains_guides">
-        </div>
-    </div>
-    <div id="hop1zuo1_of_upward">
-        <div id="contains_pieces_on_upward">
-        </div>
-        <div id="contains_guides_on_upward">
-        </div>
-    </div>
     </div>
 
     <div id="protective_cover_over_field" class="nocover">
@@ -65,21 +118,47 @@
     <div id="contains_ciurl">
         
     </div>
+
+    <div id="season_transition_message_or_water_entry_failure_message_container" class="nocover">
+        <img id="season_transition_message_or_water_entry_failure_message" src="image/season_transition_0_to_1.png" style="position: absolute; left: 153px; height: 960px; top: 18px;">
+    </div>
     <div><img src="image/water_entry.png" id="water_entry_logo" width="500" style="display: none"></div>
     <div><img src="image/dat2/撃皇.png" id="step_tam_logo" width="250" style="display: none"></div>
-    <div id="my_icon"><img src="image/larta2.png"></div>
+    <div id="my_icon" style="opacity: 0.3;"><img src="image/larta2.png"></div>
 
     <div id="larta_opponent" style="opacity: 0.3;">
         <div style="display:flex; max-height: 256px;">
             <div id="opponent_icon"><img src="image/nystiper2.png"></div>
-            <div id="opponent_message_linzklar" style="writing-mode:vertical-rl; text-align: center; font-family: 'geometric_linzklar'; font-size: 30px; height: 256px;"></div>
+            <div id="opponent_message_linzklar" style="writing-mode:vertical-rl; text-align: center; font-size: 30px; height: 256px;"></div>
         </div>
         <div id="opponent_message"></div>
     </div>
-    <textarea id="kiar_ark"></textarea>
+    <div id="piece_font_chooser">
+        <input type="radio" id="radio_官字" name="piece_font" checked>
+        <label for="radio_官字">
+            <img src="image/piece_img/官字/upright/bnuak.png" style="vertical-align: middle" width="30" height="30">
+        </label>
+        <br>
+        <input type="radio" id="radio_略字" name="piece_font">
+        <label for="radio_略字">
+            <img src="image/piece_img/略字/upright/bnuak.png" style="vertical-align: middle" width="30" height="30">
+        </label>
+        <br>
+        <input type="radio" id="radio_やる気なし" name="piece_font">
+        <label for="radio_やる気なし">
+            <img src="image/piece_img/やる気なし/upright/bnuak.png" style="vertical-align: middle" width="30" height="30">
+        </label>
+        <br>
+    </div>
+    <div id="kiar_ark_container">
+        <textarea id="kiar_ark" readonly></textarea>
+        <a id="kiar_ark_link" href="" target="_blank" rel="noopener noreferrer"><img id="cetkaik_platform_blurred_img" src="image/cetkaik_platform_blurred.png" width="80" height="80"><img id="cetkaik_platform_img" src="image/cetkaik_platform.png" width="80" height="80"></a>
+    </div>
     <div id="arrows"></div>
     <div id="score_display" class="nocover" style="z-index: 6000;"></div>
+    <div id="whether_to_take_or_step" class="nocover" style="z-index: 6000;"></div>
     <div id="final_score_display" class="nocover"></div>
+    <div class="nocover" id="to_entrance"><a href="entrance.html" target="_blank" rel="noopener noreferrer"><img src="image/始新星.png"></a></div>
 
     <div id="kait_kaik">
         <input type="image" id="kait_kaik_button" src="image/kait_kaik.png">
